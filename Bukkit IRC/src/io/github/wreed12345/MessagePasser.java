@@ -1,18 +1,34 @@
 package io.github.wreed12345;
 
-public class MessagePasser {
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+
+public class MessagePasser implements Listener {
 	/**
-	 * A mostly static class to pass things from the main plugin class to the
-	 * IRC server class. May change dramatically WIP
+	 * Pass messages from mc to irc and vise versa
 	 * 
 	 * @author William Reed
 	 * */
-	
-	static void messageProcessor(String message){
-		//add the message to the command
-		//minecraft is the channel that this will use
-		String command = "/MSG #minecraft " + message; 
+
+	@EventHandler
+	public void onChat(AsyncPlayerChatEvent event) {
+		String message = "/MSG #Minecraft " + event.getMessage();
+		/*
+		 * Thoughts on how to do this:
+		 * 1. Possibly initiate a new connection to IRC server from the MC client.
+		 * 		- Simplify's messaging and stuff.
+		 * 		- not sure if possible
+		 * 2. Add messages to array list of messages
+		 * 		- send messages as they come into the array list (while arrayList != null) {sendMessages();}
+		 * 		- then remove from array list
+		 * 		- need to somehow keep track of users through this
+		 * 3. Poop my pants
+		 * 		- easiest method to do
+		 * 		- most likely method to succeed
+		 */
 	}
 	
-	//on player join innitate new IRC connection.
+	
+
 }

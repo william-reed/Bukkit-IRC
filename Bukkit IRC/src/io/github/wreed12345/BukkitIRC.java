@@ -3,7 +3,9 @@ package io.github.wreed12345;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class BukkitIRC extends JavaPlugin implements Listener {
@@ -13,6 +15,8 @@ public class BukkitIRC extends JavaPlugin implements Listener {
 	final String VERSION = "0.0.1 Alpha";
 	@Override
 	public void onEnable() {
+		Bukkit.getPluginManager().registerEvents(new MessagePasser(), this);
+		
 		//should i be worrying about layers of these threads? threads on threads on threads...
 		Bukkit.getServer().getScheduler().runTaskAsynchronously(this, new Runnable() {
 			//args = server name
@@ -43,4 +47,5 @@ public class BukkitIRC extends JavaPlugin implements Listener {
 
 		return false;
 	}
+	
 }
