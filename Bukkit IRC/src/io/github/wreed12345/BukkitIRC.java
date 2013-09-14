@@ -9,7 +9,11 @@ import java.net.Socket;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class BukkitIRC extends JavaPlugin implements Listener {
@@ -21,11 +25,13 @@ public class BukkitIRC extends JavaPlugin implements Listener {
 
 	final String VERSION = "0.0.1 Alpha";
 
+	//possibly test if this needs ot be volatile?
 	volatile Connection ircServer;
 
 	@Override
 	public void onEnable() {
-		Bukkit.getPluginManager().registerEvents(new MessagePasser(), this);
+		//Bukkit.getPluginManager().registerEvents(new MessagePasser(), this);
+		Bukkit.getPluginManager().registerEvents(this, this);
 
 		// should i be worrying about layers of these threads? threads on
 		// threads on threads...
@@ -63,6 +69,7 @@ public class BukkitIRC extends JavaPlugin implements Listener {
 		getLogger().info("Bukkit IRC " + VERSION + " has been disabled");
 	}
 
+	//possibly test if this needs ot be volatile?
 	volatile Connection bot;
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label,
@@ -117,8 +124,18 @@ public class BukkitIRC extends JavaPlugin implements Listener {
 
 		return false;
 	}
-
-	// SEND MESSAGES FROM MC USERS AS "minecraft: <username> Hey guys!"
-	// only requires one connection
-
+	
+	//change to a class eventually
+	@EventHandler//(priority = EventPriority.HIGH)
+	void messagePasser(AsyncPlayerChatEvent event){
+		String message = event.getMessage();
+		
+		try {
+			bot.processLine("PRIVMSG #minecraft :[" + event.getPlayer().getName() + "]: " + message);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 }
