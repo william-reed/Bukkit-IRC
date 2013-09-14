@@ -32,7 +32,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * been modified.
  * 
  * @author William Reed
- * 
+ * @since 0.0.1 Alpha 
  */
 public class Connection implements Runnable {
 	public static class Channel {
@@ -66,7 +66,7 @@ public class Connection implements Runnable {
 	private String description;
 	public static Map<String, Connection> connectionMap = new HashMap<String, Connection>();
 	public static Map<String, Channel> channelMap = new HashMap<String, Channel>();
-	private static String globalServerName;
+	public static String globalServerName;
 
 	public Connection(Socket socket) {
 		this.socket = socket;
@@ -79,6 +79,8 @@ public class Connection implements Runnable {
 	/**
 	 * @param args
 	 */
+	
+	/*
 	public static void run(String[] args) throws Throwable {
 		if (args.length == 0) {
 			System.out.println("Usage: java jw.jircs.Connection <servername>");
@@ -92,7 +94,7 @@ public class Connection implements Runnable {
 			Thread thread = new Thread(jircs);
 			thread.start();
 		}
-	}
+	}*/
 
 	public enum Command {
 		NICK(1, 1) {
@@ -369,14 +371,14 @@ public class Connection implements Runnable {
 				for (String recipient : recipients) {
 					if (recipient.startsWith("#")) {
 						Channel channel = channelMap.get(recipient);
-						System.out.println("Channel: '" + channel.name + "'");
+						//System.out.println("Channel: '" + channel.name + "'");
 						
 						if (channel == null)
 							con.sendSelfNotice("No such channel, so can't send "
 									+ "a message to it: " + recipient);
-						else if (!channel.channelMembers.contains(con))
+						else if (!channel.channelMembers.contains(con) && !(con.nick.equals("MTC")))//change to variable
 							con.sendSelfNotice("You can't send messages to "
-									+ "channels you're not at.");
+									+ "channels you're not in.");
 						else
 							channel.sendNot(con, ":" + con.getRepresentation()
 									+ " PRIVMSG " + recipient + " :" + message);
@@ -473,6 +475,8 @@ public class Connection implements Runnable {
 	@Override
 	public void run() {
 		try {
+			//System.out.println("someone is connecting");
+			//processLine("/MSG #Minecraft hey guys wreed here");
 			doServer();
 		} catch (Exception e) {
 			try {
@@ -532,11 +536,11 @@ public class Connection implements Runnable {
 		while ((line = reader.readLine()) != null) {
 			processLine(line);
 		}
-
 	}
 
-	private void processLine(String line) throws Exception {
+	void processLine(String line) throws Exception {
 		System.out.println("Processing line from " + nick + ": " + line);
+		//System.out.println("SOcket: " + socket.toString());
 		String prefix = "";
 		if (line.startsWith(":")) {
 			String[] tokens = line.split(" ", 2);
@@ -605,7 +609,9 @@ public class Connection implements Runnable {
 		return theNick.replace(":", "").replace(" ", "").replace("!", "")
 				.replace("@", "").replace("#", "");
 	}
-
+	
+	
+	//never used should i get rid of?
 	private String[] padSplit(String line, String regex, int max) {
 		String[] split = line.split(regex);
 		String[] output = new String[max];
@@ -617,9 +623,11 @@ public class Connection implements Runnable {
 		}
 		return output;
 	}
-
+	
+	Queue<String> testQueue;
+	
 	public void send(String s) {
-		Queue<String> testQueue = outQueue;
+		testQueue = outQueue;
 		if (testQueue != null) {
 			System.out.println("Sending line to " + nick + ": " + s);
 			testQueue.add(s);
